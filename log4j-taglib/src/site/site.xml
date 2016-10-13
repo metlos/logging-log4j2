@@ -56,6 +56,7 @@
       <item name="JIRA Report" href="../jira-report.html" />
       <item name="Surefire Report" href="../surefire-report.html" />
       <item name="RAT Report" href="../rat-report.html" />
+      <item name="API Changes" href="../revapi-aggregate-report.html"/>
     </menu>
     <footer><div class="row span16">Apache Logging, Apache Log4j, Log4j, Apache, the Apache feather logo, and the
       Apache Logging project logo are trademarks of The Apache Software Foundation.</div>
