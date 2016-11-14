@@ -408,6 +408,15 @@ public class Bar {
                  shutdown hook is enabled by default but may be disabled by setting this attribute to "disable"</td>
               </tr>
               <tr>
+                 <td>shutdownTimeout</td>
+                 <td>Specifies how many milliseconds appenders and background tasks will get to shutdown when the JVM shuts
+                 down. Default is zero which mean that each appender uses its default timeout, and don't wait for background
+                 tasks. Not all appenders will honor this, it is a hint and not an absolute guarantee that the shutdown
+                 procedure will not take longer. Setting this too low increase the risk of losing outstanding log events
+                 not yet written to the final destination. See <a class="javadoc"
+                 href="../log4j-core/target/site/apidocs/org/apache/logging/log4j/core/LoggerContext.html#stop(long, java.util.concurrent.TimeUnit)">LoggerContext.stop(long, java.util.concurrent.TimeUnit)</a>.
+                  (Not used if <tt>shutdownHook</tt> is set to "disable".)</td>
+              <tr>
                 <td>status</td>
                 <td>The level of internal Log4j events that should be logged to the console.
                 Valid values for this attribute are "trace", "debug", "info", "warn", "error" and "fatal".
@@ -841,8 +850,8 @@ public class Bar {
             </p>
             <p>
               Properties configuration files support the advertiser, monitorInterval, name, packages, shutdownHook,
-              status, verbose, and dest attrbutes. See <a href="#ConfigurationSyntax">Configuration Syntax</a> for the
-              definitions of these attributes.
+              shutdownTimeout, status, verbose, and dest attrbutes. See <a href="#ConfigurationSyntax">Configuration Syntax</a>
+              for the definitions of these attributes.
             </p>
           <pre class="prettyprint linenums">
 status = error

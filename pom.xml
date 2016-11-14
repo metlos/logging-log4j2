@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one or more
   ~ contributor license agreements. See the NOTICE file distributed with
@@ -191,15 +190,15 @@
     <slf4jVersion>1.7.21</slf4jVersion>
     <logbackVersion>1.1.7</logbackVersion>
     <jackson1Version>1.9.13</jackson1Version>
-    <jackson2Version>2.8.3</jackson2Version>
+    <jackson2Version>2.8.4</jackson2Version>
     <springVersion>3.2.13.RELEASE</springVersion>
-    <flumeVersion>1.6.0</flumeVersion>
-    <disruptorVersion>3.3.5</disruptorVersion>
+    <flumeVersion>1.7.0</flumeVersion>
+    <disruptorVersion>3.3.6</disruptorVersion>
     <conversantDisruptorVersion>1.2.8-JDK7</conversantDisruptorVersion>
-    <compiler.plugin.version>3.5.1</compiler.plugin.version>
-    <pmd.plugin.version>3.6</pmd.plugin.version>
+    <compiler.plugin.version>3.6.0</compiler.plugin.version>
+    <pmd.plugin.version>3.7</pmd.plugin.version>
     <findbugs.plugin.version>3.0.4</findbugs.plugin.version>
-    <changes.plugin.version>2.12</changes.plugin.version>
+    <changes.plugin.version>2.12.1</changes.plugin.version>
     <javadoc.plugin.version>2.10.4</javadoc.plugin.version>
     <!-- surefire.plugin.version 2.18 yields http://jira.codehaus.org/browse/SUREFIRE-1121, which is fixed in 2.18.1 -->
     <!-- surefire.plugin.version 2.19 yields https://issues.apache.org/jira/browse/SUREFIRE-1193. -->
@@ -209,10 +208,11 @@
     <rat.plugin.version>0.12</rat.plugin.version>
     <pdf.plugin.version>1.2</pdf.plugin.version>
     <cobertura.plugin.version>2.7</cobertura.plugin.version>
+    <jacoco.plugin.version>0.7.7.201606060606</jacoco.plugin.version>
     <release.plugin.version>2.5.3</release.plugin.version>
     <scm.plugin.version>1.9.5</scm.plugin.version>
     <jxr.plugin.version>2.5</jxr.plugin.version>
-    <clirr.plugin.version>2.6.1</clirr.plugin.version>
+    <clirr.plugin.version>2.8</clirr.plugin.version>
     <site.plugin.version>3.4</site.plugin.version>
     <manifestfile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestfile>
     <maven.compile.source>1.7</maven.compile.source>
@@ -221,12 +221,13 @@
     <projectDir />
     <commonsLoggingVersion>1.2</commonsLoggingVersion>
     <osgi.api.version>4.3.1</osgi.api.version>
-    <activemq.version>5.14.0</activemq.version>
+    <activemq.version>5.14.1</activemq.version>
     <!-- Allow Clirr severity to be overriden by the command-line option -DminSeverity=level -->
     <minSeverity>info</minSeverity>
     <jctoolsVersion>1.2.1</jctoolsVersion>
     <revapi.maven.plugin.version>0.7.0</revapi.maven.plugin.version>
     <revapi.java.version>0.11.2</revapi.java.version>
+    <mockitoVersion>2.2.7</mockitoVersion>
   </properties>
   <pluginRepositories>
     <pluginRepository>
@@ -290,7 +291,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.4</version>
+        <version>3.5</version>
       </dependency>
       <dependency>
         <groupId>com.beust</groupId>
@@ -403,7 +404,7 @@
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
         <artifactId>jansi</artifactId>
-        <version>1.13</version>
+        <version>1.14</version>
         <optional>true</optional>
       </dependency>
       <dependency>
@@ -614,7 +615,7 @@
       <dependency>
         <groupId>org.zeromq</groupId>
         <artifactId>jeromq</artifactId>
-        <version>0.3.5</version>
+        <version>0.3.6</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -656,9 +657,9 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>3.4</version>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockitoVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -804,7 +805,7 @@
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
           <!--  Using version 2.5.4 causes Jenkins to get compiler errors in log4j-perf. -->
-          <version>2.5.3</version>
+          <version>3.2.0</version>
           <inherited>true</inherited>
           <extensions>true</extensions>
           <executions>
@@ -870,6 +871,30 @@
               <Xlint />
             </compilerArguments>
           </configuration>
+          <executions>
+            <execution>
+              <!-- disable annotation processing for first pass -->
+              <id>default-compile</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <phase>compile</phase>
+              <configuration>
+                <proc>none</proc>
+              </configuration>
+            </execution>
+            <execution>
+              <!-- then do a processing-only pass to generate plugins .dat file -->
+              <id>process-plugins</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <phase>process-classes</phase>
+              <configuration>
+                <proc>only</proc>
+              </configuration>
+            </execution>
+          </executions>          
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -905,6 +930,24 @@
           <artifactId>revapi-maven-plugin</artifactId>
           <version>${revapi.maven.plugin.version}</version>
         </plugin>
+        <plugin>
+          <groupId>org.eluder.coveralls</groupId>
+          <artifactId>coveralls-maven-plugin</artifactId>
+          <version>4.3.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.plugin.version}</version>
+          <executions>
+            <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -915,18 +958,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>${compiler.plugin.version}</version>
-        <configuration>
-          <source>${maven.compile.source}</source>
-          <target>${maven.compile.target}</target>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-          <compilerArguments>
-            <Xmaxwarns>10000</Xmaxwarns>
-            <Xlint />
-          </compilerArguments>
-          <encoding>UTF-8</encoding>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1054,7 +1085,6 @@
           </execution>
         </executions>
       </plugin> -->
-
       <!-- We need to disable the standard ASF configuration to be able to publish our own notice and license files -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1285,6 +1315,7 @@
     <module>log4j-taglib</module>
     <module>log4j-jmx-gui</module>
     <module>log4j-samples</module>
+    <module>log4j-osgi</module>
     <module>log4j-bom</module>
     <module>log4j-nosql</module>
     <module>log4j-web</module>

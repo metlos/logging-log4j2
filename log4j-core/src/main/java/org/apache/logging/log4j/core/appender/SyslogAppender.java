@@ -20,12 +20,15 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.appender.SocketAppender.Builder;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAliases;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginBuilderAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginConfiguration;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
@@ -36,6 +39,7 @@ import org.apache.logging.log4j.core.net.AbstractSocketManager;
 import org.apache.logging.log4j.core.net.Advertiser;
 import org.apache.logging.log4j.core.net.Facility;
 import org.apache.logging.log4j.core.net.Protocol;
+import org.apache.logging.log4j.core.net.SocketOptions;
 import org.apache.logging.log4j.core.net.ssl.SslConfiguration;
 import org.apache.logging.log4j.core.util.Constants;
 import org.apache.logging.log4j.util.EnglishEnums;
@@ -43,9 +47,43 @@ import org.apache.logging.log4j.util.EnglishEnums;
 /**
  * The Syslog Appender.
  */
-@Plugin(name = "Syslog", category = "Core", elementType = Appender.ELEMENT_TYPE, printObject = true)
+@Plugin(name = "Syslog", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE, printObject = true)
 public class SyslogAppender extends SocketAppender {
 
+    public static class Builder<B extends Builder<B>> extends AbstractOutputStreamAppender.Builder<B>
+            implements org.apache.logging.log4j.core.util.Builder<SyslogAppender> {
+
+//        @PluginAliases("reconnectionDelay") // deprecated
+//        @PluginAttribute("name") final String name,
+//        @PluginAttribute(value = "immediateFlush", defaultBoolean = true) final boolean immediateFlush,
+//        @PluginAttribute(value = "ignoreExceptions", defaultBoolean = true) final boolean ignoreExceptions,
+//        @PluginAttribute(value = "facility", defaultString = "LOCAL0") final Facility facility,
+//        @PluginAttribute("id") final String id,
+//        @PluginAttribute(value = "enterpriseNumber", defaultInt = Rfc5424Layout.DEFAULT_ENTERPRISE_NUMBER) final int enterpriseNumber,
+//        @PluginAttribute(value = "includeMdc", defaultBoolean = true) final boolean includeMdc,
+//        @PluginAttribute("mdcId") final String mdcId,
+//        @PluginAttribute("mdcPrefix") final String mdcPrefix,
+//        @PluginAttribute("eventPrefix") final String eventPrefix,
+//        @PluginAttribute(value = "newLine") final boolean newLine,
+//        @PluginAttribute("newLineEscape") final String escapeNL,
+//        @PluginAttribute("appName") final String appName,
+//        @PluginAttribute("messageId") final String msgId,
+//        @PluginAttribute("mdcExcludes") final String excludes,
+//        @PluginAttribute("mdcIncludes") final String includes,
+//        @PluginAttribute("mdcRequired") final String required,
+//        @PluginAttribute("format") final String format,
+//        @PluginElement("Filter") final Filter filter,
+//        @PluginAttribute(value = "charset", defaultString = "UTF-8") final Charset charsetName,
+//        @PluginAttribute("exceptionPattern") final String exceptionPattern,
+//        @PluginElement("LoggerFields") final LoggerFields[] loggerFields, 
+
+        @Override
+        public SyslogAppender build() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    }
+    
     protected static final String RFC5424 = "RFC5424";
 
     protected SyslogAppender(final String name, final Layout<? extends Serializable> layout, final Filter filter,
@@ -56,7 +94,7 @@ public class SyslogAppender extends SocketAppender {
     }
 
     /**
-     * Create a SyslogAppender.
+     * Creates a SyslogAppender.
      * @param host The name of the host to connect to.
      * @param port The port to connect to on the target host.
      * @param protocolStr The Protocol to use.
@@ -114,7 +152,7 @@ public class SyslogAppender extends SocketAppender {
             @PluginAttribute("mdcId") final String mdcId,
             @PluginAttribute("mdcPrefix") final String mdcPrefix,
             @PluginAttribute("eventPrefix") final String eventPrefix,
-            @PluginAttribute(value = "newLine", defaultBoolean = false) final boolean newLine,
+            @PluginAttribute(value = "newLine") final boolean newLine,
             @PluginAttribute("newLineEscape") final String escapeNL,
             @PluginAttribute("appName") final String appName,
             @PluginAttribute("messageId") final String msgId,
@@ -127,7 +165,7 @@ public class SyslogAppender extends SocketAppender {
             @PluginAttribute(value = "charset", defaultString = "UTF-8") final Charset charsetName,
             @PluginAttribute("exceptionPattern") final String exceptionPattern,
             @PluginElement("LoggerFields") final LoggerFields[] loggerFields, 
-            @PluginAttribute(value = "advertise", defaultBoolean = false) final boolean advertise) {
+            @PluginAttribute(value = "advertise") final boolean advertise) {
         // @formatter:on
 
         final Protocol protocol = EnglishEnums.valueOf(Protocol.class, protocolStr);

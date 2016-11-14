@@ -130,6 +130,26 @@ try (final CloseableThreadContext.Instance ctc = CloseableThreadContext.put("id"
 .
 .
 }</pre>
+
+            If you're using a thread pool, then you can initialise a CloseableThreadContext by using the
+            <tt>putAll(final Map&lt;String, String&gt; values)</tt> and/or
+            <tt>pushAll(List&lt;String&gt; messages)</tt> methods;
+            <pre class="prettyprint linenums">
+for( final Session session : sessions ) {
+    try (final CloseableThreadContext.Instance ctc = CloseableThreadContext.put("loginId", session.getAttribute("loginId"))) {
+        logger.debug("Starting background thread for user");
+        final Map&lt;String, String&gt; values = ThreadContext.getImmutableContext();
+        final List&lt;String&gt; messages = ThreadContext.getImmutableStack().asList();
+        executor.submit(new Runnable() {
+        public void run() {
+            try (final CloseableThreadContext.Instance ctc = CloseableThreadContext.putAll(values).pushAll(messages)) {
+                logger.debug("Processing for user started");
+                .
+                logger.debug("Processing for user completed");
+            }
+        });
+    }
+}</pre>
 		  <h4>Implementation details</h4>
           <p>The Stack and the Map are managed per thread and are based on
             <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/ThreadLocal.html">ThreadLocal</a>
@@ -167,10 +187,10 @@ try (final CloseableThreadContext.Instance ctc = CloseableThreadContext.put("id"
               Use <code>%x</code> to include the full contents of the <a href="http://docs.oracle.com/javase/6/docs/api/java/util/Stack.html">Stack</a>.
             </li>
           </ul>
-          <h4>Non thread-local context data </h4>
+          <h4>Custom context data injectors for non thread-local context data</h4>
           <p>
-            The ThreadContext allows us to tag logging statements so we can link log entries that were related
-            in some way. The limitation is that this only works for logging done on the same application thread
+            With the ThreadContext logging statements can be tagged so log entries that were related in some way
+            can be linked via these tags. The limitation is that this only works for logging done on the same application thread
             (or child threads when configured).
           </p>
           <p>

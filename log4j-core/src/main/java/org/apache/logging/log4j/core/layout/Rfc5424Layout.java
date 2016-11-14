@@ -128,7 +128,7 @@ public final class Rfc5424Layout extends AbstractStringLayout {
             final String exceptionPattern, final boolean useTLSMessageFormat, final LoggerFields[] loggerFields) {
         super(charset);
         final PatternParser exceptionParser = createPatternParser(config, ThrowablePatternConverter.class);
-        exceptionFormatters = exceptionPattern == null ? null : exceptionParser.parse(exceptionPattern, false, false);
+        exceptionFormatters = exceptionPattern == null ? null : exceptionParser.parse(exceptionPattern);
         this.facility = facility;
         this.defaultId = id == null ? DEFAULT_ID : id;
         this.enterpriseNumber = ein;
@@ -207,7 +207,7 @@ public final class Rfc5424Layout extends AbstractStringLayout {
                     final PatternParser fieldParser = createPatternParser(config, null);
 
                     for (final Map.Entry<String, String> entry : fields.entrySet()) {
-                        final List<PatternFormatter> formatters = fieldParser.parse(entry.getValue(), false, false);
+                        final List<PatternFormatter> formatters = fieldParser.parse(entry.getValue());
                         sdParams.put(entry.getKey(), formatters);
                     }
                     final FieldFormatter fieldFormatter = new FieldFormatter(sdParams,
@@ -640,7 +640,7 @@ public final class Rfc5424Layout extends AbstractStringLayout {
             @PluginAttribute(value = "mdcId", defaultString = DEFAULT_MDCID) final String mdcId,
             @PluginAttribute("mdcPrefix") final String mdcPrefix,
             @PluginAttribute("eventPrefix") final String eventPrefix,
-            @PluginAttribute(value = "newLine", defaultBoolean = false) final boolean newLine,
+            @PluginAttribute(value = "newLine") final boolean newLine,
             @PluginAttribute("newLineEscape") final String escapeNL,
             @PluginAttribute("appName") final String appName,
             @PluginAttribute("messageId") final String msgId,
@@ -649,7 +649,7 @@ public final class Rfc5424Layout extends AbstractStringLayout {
             @PluginAttribute("mdcRequired") final String required,
             @PluginAttribute("exceptionPattern") final String exceptionPattern,
             // RFC 5425
-            @PluginAttribute(value = "useTlsMessageFormat", defaultBoolean = false) final boolean useTlsMessageFormat,
+            @PluginAttribute(value = "useTlsMessageFormat") final boolean useTlsMessageFormat,
             @PluginElement("LoggerFields") final LoggerFields[] loggerFields,
             @PluginConfiguration final Configuration config) {
         // @formatter:on

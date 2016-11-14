@@ -16,8 +16,6 @@
  */
 package org.apache.logging.log4j.core;
 
-import static org.apache.logging.log4j.core.util.ShutdownCallbackRegistry.SHUTDOWN_HOOK_MARKER;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -38,7 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.apache.logging.log4j.core.config.ConfigurationListener;
-import org.apache.logging.log4j.core.config.ConfigurationSource; // SUPPRESS CHECKSTYLE
+import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.apache.logging.log4j.core.config.NullConfiguration;
 import org.apache.logging.log4j.core.config.Reconfigurable;
@@ -55,6 +53,8 @@ import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.apache.logging.log4j.spi.Terminable;
 import org.apache.logging.log4j.util.PropertiesUtil;
+
+import static org.apache.logging.log4j.core.util.ShutdownCallbackRegistry.SHUTDOWN_HOOK_MARKER;
 
 /**
  * The LoggerContext is the anchor for the logging system. It maintains a list of all the loggers requested by
@@ -265,6 +265,7 @@ public class LoggerContext extends AbstractLifeCycle
             if (factory instanceof ShutdownCallbackRegistry) {
                 LOGGER.debug(SHUTDOWN_HOOK_MARKER, "Shutdown hook enabled. Registering a new one.");
                 try {
+                    final long shutdownTimeoutMillis = this.configuration.getShutdownTimeoutMillis();
                     this.shutdownCallback = ((ShutdownCallbackRegistry) factory).addShutdownCallback(new Runnable() {
                         @Override
                         public void run() {
@@ -272,7 +273,7 @@ public class LoggerContext extends AbstractLifeCycle
                             final LoggerContext context = LoggerContext.this;
                             LOGGER.debug(SHUTDOWN_HOOK_MARKER, "Stopping LoggerContext[name={}, {}]",
                                     context.getName(), context);
-                            context.stop();
+                            context.stop(shutdownTimeoutMillis, TimeUnit.MILLISECONDS);
                         }
 
                         @Override
@@ -301,6 +302,25 @@ public class LoggerContext extends AbstractLifeCycle
         stop();
     }
 
+    /**
+     * Blocks until all Log4j tasks have completed execution after a shutdown request and all appenders have shut down,
+     * or the timeout occurs, or the current thread is interrupted, whichever happens first.
+     * <p>
+     * Not all appenders will honor this, it is a hint and not an absolute guarantee that the this method not block longer.
+     * Setting timeout too low increase the risk of losing outstanding log events not yet written to the final
+     * destination.
+     * <p>
+     * Log4j can start threads to perform certain actions like file rollovers, calling this method with a positive timeout will
+     * block until the rollover thread is done.
+     *
+     * @param timeout the maximum time to wait, or 0 which mean that each apppender uses its default timeout, and don't wait for background
+    tasks
+     * @param timeUnit
+     *            the time unit of the timeout argument
+     * @return {@code true} if the logger context terminated and {@code false} if the timeout elapsed before
+     *         termination.
+     * @since 2.7
+     */
     @Override
     public boolean stop(final long timeout, final TimeUnit timeUnit) {
         LOGGER.debug("Stopping LoggerContext[name={}, {}]...", getName(), this);
@@ -336,7 +356,7 @@ public class LoggerContext extends AbstractLifeCycle
             final String source = "LoggerContext \'" + getName() + "\'";
             shutdownEs = ExecutorServices.shutdown(executorService, timeout, timeUnit, source);
             // Do not wait for daemon threads
-            shutdownEsd = ExecutorServices.shutdown(executorServiceDeamons, -1, timeUnit, source);
+            shutdownEsd = ExecutorServices.shutdown(executorServiceDeamons, 0, timeUnit, source);
         } finally {
             configLock.unlock();
             this.setStopped();

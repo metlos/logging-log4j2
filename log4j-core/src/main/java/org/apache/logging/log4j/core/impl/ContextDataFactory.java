@@ -47,6 +47,11 @@ public class ContextDataFactory {
     private static final Class<?> CACHED_CLASS = createCachedClass(CLASS_NAME);
     private static final Constructor<?> CACHED_CONSTRUCTOR = createCachedConstructor(CACHED_CLASS);
 
+    private static final StringMap EMPTY_STRING_MAP = createContextData(1);
+    static {
+        EMPTY_STRING_MAP.freeze();
+    }
+
     private static Class<?> createCachedClass(final String className) {
         if (className == null) {
             return null;
@@ -91,5 +96,14 @@ public class ContextDataFactory {
         } catch (final Exception any) {
             return new SortedArrayStringMap(initialCapacity);
         }
+    }
+
+    /**
+     * An empty pre-frozen StringMap. The returned object may be shared.
+     *
+     * @return an empty pre-frozen StringMap
+     */
+    public static StringMap emptyFrozenContextData() {
+        return EMPTY_STRING_MAP;
     }
 }

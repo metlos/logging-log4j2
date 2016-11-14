@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.Deflater;
 
 import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -44,7 +45,7 @@ import org.apache.logging.log4j.core.util.Integers;
 /**
  * An appender that writes to files and can roll over at intervals.
  */
-@Plugin(name = RollingFileAppender.PLUGIN_NAME, category = "Core", elementType = Appender.ELEMENT_TYPE, printObject = true)
+@Plugin(name = RollingFileAppender.PLUGIN_NAME, category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE, printObject = true)
 public final class RollingFileAppender extends AbstractOutputStreamAppender<RollingFileManager> {
 
     public static final String PLUGIN_NAME = "RollingFile";
@@ -53,7 +54,7 @@ public final class RollingFileAppender extends AbstractOutputStreamAppender<Roll
      * Builds FileAppender instances.
      * 
      * @param <B>
-     *            This builder class
+     *            The type to build
      */
     public static class Builder<B extends Builder<B>> extends AbstractOutputStreamAppender.Builder<B>
             implements org.apache.logging.log4j.core.util.Builder<RollingFileAppender> {

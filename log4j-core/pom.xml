@@ -203,8 +203,8 @@
     </dependency>
     <!-- Mocking framework for use with JUnit -->
     <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Embedded JDBC drivers for database appender tests -->
@@ -333,30 +333,6 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${compiler.plugin.version}</version>
-        <executions>
-          <execution>
-            <!-- disable annotation processing for first pass -->
-            <id>default-compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <phase>compile</phase>
-            <configuration>
-              <proc>none</proc>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- then do a processing-only pass to generate plugins .dat file -->
-            <id>process-plugins</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <phase>process-classes</phase>
-            <configuration>
-              <proc>only</proc>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>

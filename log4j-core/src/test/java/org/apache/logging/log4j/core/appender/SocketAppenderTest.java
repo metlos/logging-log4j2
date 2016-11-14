@@ -327,18 +327,23 @@ public class SocketAppenderTest {
 
     public static class TcpSocketTestServer extends Thread {
 
-        private final ServerSocket sock;
+        private final ServerSocket serverSocket;
         private volatile boolean shutdown = false;
         private volatile int count = 0;
         private final BlockingQueue<LogEvent> queue;
 
+        @SuppressWarnings("resource")
         public TcpSocketTestServer(final int port) throws IOException {
-            this.sock = new ServerSocket(port);
+            this(new ServerSocket(port));
+        }
+
+        public TcpSocketTestServer(ServerSocket serverSocket) {
+            this.serverSocket = serverSocket;
             this.queue = new ArrayBlockingQueue<>(10);
         }
 
         public int getLocalPort() {
-            return sock.getLocalPort();
+            return serverSocket.getLocalPort();
         }
         
         public void reset() {
@@ -354,7 +359,7 @@ public class SocketAppenderTest {
         @Override
         public void run() {
             try {
-                try (final Socket socket = sock.accept()) {
+                try (final Socket socket = serverSocket.accept()) {
                     if (socket != null) {
                         final ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         while (!shutdown) {
