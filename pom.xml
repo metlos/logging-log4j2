@@ -225,8 +225,8 @@
     <!-- Allow Clirr severity to be overriden by the command-line option -DminSeverity=level -->
     <minSeverity>info</minSeverity>
     <jctoolsVersion>1.2.1</jctoolsVersion>
-    <revapi.maven.plugin.version>0.6.1</revapi.maven.plugin.version>
-    <revapi.java.version>0.10.2</revapi.java.version>
+    <revapi.maven.plugin.version>0.7.0</revapi.maven.plugin.version>
+    <revapi.java.version>0.11.2</revapi.java.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>
